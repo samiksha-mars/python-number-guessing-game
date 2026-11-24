@@ -77,3 +77,30 @@ def play_round(difficulty, rng=random, input_fn=input, output_fn=print):
         output_fn(f"Too {result}. {left} attempt(s) left.")
     output_fn(f"Out of attempts! The number was {secret}.")
     return None
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Guess the secret number.")
+    parser.add_argument("-d", "--difficulty", choices=list(DIFFICULTIES), default="medium")
+    parser.add_argument("--scores", default=DEFAULT_SCORES, help="where best scores are saved")
+    args = parser.parse_args(argv)
+
+    board = ScoreBoard(args.scores)
+    try:
+        while True:
+            best = board.best(args.difficulty)
+            print(f"\n=== {args.difficulty.title()} mode"
+                  + (f" | best: {best} attempt(s)" if best else "") + " ===")
+            attempts = play_round(args.difficulty)
+            if attempts is not None and board.record(args.difficulty, attempts):
+                print("New best score!")
+            if input("Play again? [y/N] ").strip().lower() != "y":
+                break
+    except (KeyboardInterrupt, EOFError):
+        print()
+    print("Thanks for playing!")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
