@@ -1,4 +1,3 @@
-import random
 import tempfile
 import unittest
 from pathlib import Path
@@ -56,11 +55,16 @@ class PlayRoundTest(unittest.TestCase):
                                      input_fn=scripted(*guesses), output_fn=output.append))
         self.assertIn("The number was 99", output[-1])
 
-    def test_secret_is_within_range(self):
-        rng = random.Random(1)
-        for _ in range(50):
-            play_round("easy", rng=rng, input_fn=scripted(*[str(n) for n in range(1, 51)]),
-                       output_fn=lambda s: None)
+    def test_secret_uses_difficulty_range(self):
+        calls = []
+
+        class RecordingRandom:
+            def randint(self, low, high):
+                calls.append((low, high))
+                return low
+
+        play_round("hard", rng=RecordingRandom(), input_fn=scripted("1"), output_fn=lambda s: None)
+        self.assertEqual(calls, [(1, 500)])
 
 
 class ScoreBoardTest(unittest.TestCase):
