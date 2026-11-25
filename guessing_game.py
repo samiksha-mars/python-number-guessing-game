@@ -41,9 +41,14 @@ class ScoreBoard:
     def __init__(self, path=DEFAULT_SCORES):
         self.path = Path(path)
         try:
-            self.scores = json.loads(self.path.read_text(encoding="utf-8"))
+            data = json.loads(self.path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
-            self.scores = {}
+            data = {}
+        if not isinstance(data, dict):
+            data = {}
+        # Ignore anything that isn't a whole number of attempts.
+        self.scores = {key: value for key, value in data.items()
+                       if isinstance(value, int) and not isinstance(value, bool)}
 
     def best(self, difficulty):
         return self.scores.get(difficulty)

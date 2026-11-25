@@ -92,6 +92,15 @@ class ScoreBoardTest(unittest.TestCase):
         self.path.write_text("not json")
         self.assertIsNone(ScoreBoard(self.path).best("hard"))
 
+    def test_unexpected_json_is_ignored(self):
+        self.path.write_text("[1, 2]")
+        self.assertIsNone(ScoreBoard(self.path).best("easy"))
+        self.path.write_text('{"easy": "fast", "medium": 4}')
+        board = ScoreBoard(self.path)
+        self.assertIsNone(board.best("easy"))
+        self.assertEqual(board.best("medium"), 4)
+        self.assertTrue(board.record("easy", 6))
+
 
 if __name__ == "__main__":
     unittest.main()
