@@ -28,7 +28,10 @@ def parse_guess(raw, high):
     raw = raw.strip()
     if not raw.lstrip("-").isdigit():
         return None
-    value = int(raw)
+    try:
+        value = int(raw)
+    except ValueError:  # e.g. "--5", or digit-like characters such as "²"
+        return None
     return value if 1 <= value <= high else None
 
 

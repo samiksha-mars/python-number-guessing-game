@@ -32,6 +32,10 @@ class RulesTest(unittest.TestCase):
         self.assertIsNone(parse_guess("101", 100))
         self.assertIsNone(parse_guess("-5", 100))
 
+    def test_parse_guess_rejects_malformed_numbers(self):
+        for raw in ("--5", "²", "-", ""):
+            self.assertIsNone(parse_guess(raw, 100), raw)
+
 
 class PlayRoundTest(unittest.TestCase):
 
